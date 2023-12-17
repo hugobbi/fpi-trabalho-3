@@ -2,23 +2,59 @@
 
 using namespace cv;
 
-int sliderValue = 0;
-
-void onTrackbarChange(int value, void* userData) {
-    // Update the global variable with the current slider value
-    sliderValue = value;
-
-    // You can perform any actions based on the slider value here
-    // For example, update the displayed image with a processed version
-
-    // For demonstration purposes, just print the current value
-    std::cout << "Slider Value: " << sliderValue << std::endl;
-}
-
-
-void applyGaussianBlurSlider(InputArray inputFrame, OutputArray outputFrame, Size ksize, double sigmaX)
+void updateKernelSize(int* ksize, int ksizeTrackbarValue)
 {
-    createTrackbar("Slider", "Kernel Size", &sliderValue, 100, onTrackbarChange);
-    GaussianBlur(inputFrame, outputFrame, Size(9, 9), 0);
+    *ksize = 2 * ksizeTrackbarValue - 1;
+    if (ksizeTrackbarValue == 0)
+        *ksize = 1;
 }
 
+void displayGaussianBlur(VideoCapture cap)
+{
+    namedWindow("Output video", WINDOW_NORMAL);
+    int ksizeTrackbarValue = 0;
+    createTrackbar("Kernel size", "Output video", &ksizeTrackbarValue, 100);
+
+    for(;;)
+    {
+        Mat frame;
+        cap >> frame;
+        if( frame.empty() ) break; // end of video stream
+        imshow("Input video", frame);
+
+        // apply to operation to frame and display in new window
+        Mat outputFrame;
+        int ksize;
+        updateKernelSize(&ksize, ksizeTrackbarValue);
+        GaussianBlur(frame, outputFrame, Size(ksize, ksize), 0);
+        
+        // Display output frame  
+        if( outputFrame.empty() ) break; // end of video stream
+        imshow("Output video", outputFrame);
+
+        if( waitKey(1) == 27 ) break; // stop capturing by pressing ESC
+    }
+}
+
+void displayCannyEdgeDetection(VideoCapture cap)
+{
+    //namedWindow("Output video", WINDOW_NORMAL);
+
+    for(;;)
+    {
+        Mat frame;
+        cap >> frame;
+        if( frame.empty() ) break; // end of video stream
+        imshow("Input video", frame);
+
+        // apply to operation to frame and display in new window
+        Mat outputFrame;
+        Canny(frame, outputFrame, 100, 200);
+        
+        // Display output frame  
+        if( outputFrame.empty() ) break; // end of video stream
+        imshow("Output video", outputFrame);
+
+        if( waitKey(1) == 27 ) break; // stop capturing by pressing ESC
+    }
+}

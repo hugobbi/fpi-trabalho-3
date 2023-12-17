@@ -3,4 +3,5 @@
 
 using namespace cv;
 
-void applyGaussianBlurSlider(InputArray inputFrame, OutputArray outputFrame, Size ksize, double sigmaX);
+void displayGaussianBlur(VideoCapture cap);
+void displayCannyEdgeDetection(VideoCapture cap);
