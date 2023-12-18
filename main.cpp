@@ -7,10 +7,12 @@ int main(int argc, char** argv)
     // Initialize video capture
     int camera = 0;
     VideoCapture cap;
+    VideoWriter vw;
     // Open the default camera, use something different from 0 otherwise;
     // Check VideoCapture documentation.
     if(!cap.open(camera))
         return -1;
+
     for(;;)
     {
         Mat frame;
@@ -24,11 +26,11 @@ int main(int argc, char** argv)
         frame.copyTo(outputFrame);
 
         // 2)
-        //applyGaussianBlur(frame, outputFrame); 
+        //applyGaussianBlur(frame, outputFrame, 0); 
         // 3)
-        //Canny(frame, outputFrame, 100, 200); 
+        //applyCanny(frame, outputFrame);
         // 4)
-        //Sobel(frame, outputFrame, -1, 1, 1); 
+        //applySobel(frame, outputFrame);
         // 5)
         //adjustBrightnessContrast(frame, outputFrame);
         // 6)
@@ -40,13 +42,20 @@ int main(int argc, char** argv)
         // 9)
         //flip(frame, outputFrame, 1); // 0: vertically 1: horizontally
 
+        // 10)
+        //VideoWriter vw = writeVideoToFile(cap, "outputVideo.avi", outputFrame, 10);
+
         // Display output frame  
         if( outputFrame.empty() ) break; // end of video stream
         imshow("Output video", outputFrame);
 
-        if( waitKey(1) == 27 ) break; // stop capturing by pressing ESC
+        if(waitKey(1) == 27)
+        {
+            vw.release();
+            cap.release(); // release the VideoCapture object
+            break; // stop capturing by pressing ESC
+        } 
     }
 
-    cap.release(); // release the VideoCapture object
     return 0;
 }
